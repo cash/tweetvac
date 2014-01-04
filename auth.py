@@ -1,53 +1,67 @@
 from twython import Twython
 import ConfigParser
 
-# TODO: turn this into an authorization class
 # TODO: catch common problems and display friendly error messages
 
-config = ConfigParser.RawConfigParser()
-config.read('tweetvac.cfg')
-try:
-    consumer_key = config.get('Auth', 'consumer_key')
-    consumer_secret = config.get('Auth', 'consumer_secret')
-    oauth_token = config.get('Auth', 'oauth_token')
-    oauth_token_secret = config.get('Auth', 'oauth_token_secret')
-    print oauth_token_secret
-    exit()
-except ConfigParser.NoSectionError:
-    print "no data"
+
+class TwitterAuthConfig:
+    config_filename = 'tweetvac.cfg'
+
+    def __init__(self):
+        self._config = ConfigParser.RawConfigParser()
+        self.consumer_key = ''
+        self.consumer_secret = ''
+        self.oauth_token = ''
+        self.oauth_token_secret = ''
+
+    def load(self):
+        if not self._get_config_from_file():
+            self._get_config_from_user()
+            self._save_config()
+
+    def _get_config_from_file(self):
+        self._config.read(TwitterAuthConfig.config_filename)
+        try:
+            self.consumer_key = self._config.get('Auth', 'consumer_key')
+            self.consumer_secret = self._config.get('Auth', 'consumer_secret')
+            self.oauth_token = self._config.get('Auth', 'oauth_token')
+            self.oauth_token_secret = self._config.get('Auth', 'oauth_token_secret')
+            success = True
+        except ConfigParser.NoSectionError:
+            success = False
+
+        return success
+
+    def _get_config_from_user(self):
+        print "Register your application with Twitter at https://dev.twitter.com/apps"
+        self._params.consumer_key = raw_input("Enter your consumer key: ").strip()
+        self._params.consumer_secret = raw_input("Enter your consumer secret: ").strip()
+
+        twitter = Twython(self.consumer_key, self.consumer_secret)
+        auth = twitter.get_authentication_tokens()
+        request_oauth_token_secret = auth['oauth_token_secret']
+        request_oauth_token = auth['oauth_token']
+        request_auth_url = auth['auth_url']
+
+        print "\nApprove access to your data at " + request_auth_url
+        auth_pin = raw_input("Then enter the authorization PIN: ").strip()
+        twitter = Twython(self.consumer_key, self.consumer_secret, request_oauth_token, request_oauth_token_secret)
+        oauth = twitter.get_authorized_tokens(auth_pin)
+
+        self.oauth_token = oauth['oauth_token']
+        self.oauth_token_secret = oauth['oauth_token_secret']
+
+    def _save_config(self):
+        self._config.add_section('Auth')
+        self._config.set('Auth', 'consumer_key', self.consumer_key)
+        self._config.set('Auth', 'consumer_secret', self.consumer_secret)
+        self._config.set('Auth', 'oauth_token', self.oauth_token)
+        self._config.set('Auth', 'oauth_token_secret', self.oauth_token_secret)
+
+        with open(TwitterAuthConfig.config_filename, 'wb') as config_file:
+            self._config.write(config_file)
 
 
-print "Register your application with Twitter at https://dev.twitter.com/apps"
-consumer_key = raw_input("Enter your consumer key: ").strip()
-consumer_secret = raw_input("Enter your consumer secret: ").strip()
-
-twitter = Twython(consumer_key, consumer_secret)
-auth = twitter.get_authentication_tokens()
-
-request_oauth_token_secret = auth['oauth_token_secret']
-request_oauth_token = auth['oauth_token']
-request_auth_url = auth['auth_url']
-
-print "\nApprove access to your data at " + request_auth_url
-auth_pin = raw_input("Then enter the authorization PIN: ").strip()
-
-twitter = Twython(consumer_key, consumer_secret, request_oauth_token, request_oauth_token_secret)
-
-oauth = twitter.get_authorized_tokens(auth_pin)
-oauth_token = oauth['oauth_token']
-oauth_token_secret = oauth['oauth_token_secret']
-
-config.add_section('Auth')
-config.set('Auth', 'consumer_key', consumer_key)
-config.set('Auth', 'consumer_secret', consumer_secret)
-config.set('Auth', 'oauth_token', oauth_token)
-config.set('Auth', 'oauth_token_secret', oauth_token_secret);
-
-with open('tweetvac.cfg', 'wb') as config_file:
-    config.write(config_file)
-
-
-
-
-
-
+config = TwitterAuthConfig()
+config.load()
+print config.consumer_key
