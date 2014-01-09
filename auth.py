@@ -1,4 +1,4 @@
-from twython import Twython
+import twython
 import ConfigParser
 
 # TODO: catch common problems and display friendly error messages
@@ -33,19 +33,23 @@ class TwitterAuthConfig:
         return success
 
     def _get_config_from_user(self):
-        print "Register your application with Twitter at https://dev.twitter.com/apps"
-        self._params.consumer_key = raw_input("Enter your consumer key: ").strip()
-        self._params.consumer_secret = raw_input("Enter your consumer secret: ").strip()
+        print "\ntweetvac is not configured. Launching the configuration helper..."
+        print "\nRegister this application with Twitter at https://dev.twitter.com/apps"
+        self.consumer_key = raw_input("Enter your consumer key: ").strip()
+        self.consumer_secret = raw_input("Enter your consumer secret: ").strip()
 
-        twitter = Twython(self.consumer_key, self.consumer_secret)
-        auth = twitter.get_authentication_tokens()
-        request_oauth_token_secret = auth['oauth_token_secret']
-        request_oauth_token = auth['oauth_token']
-        request_auth_url = auth['auth_url']
+        twitter = twython.Twython(self.consumer_key, self.consumer_secret)
+        try:
+            auth = twitter.get_authentication_tokens()
+            request_oauth_token_secret = auth['oauth_token_secret']
+            request_oauth_token = auth['oauth_token']
+            request_auth_url = auth['auth_url']
+        except twython.exceptions.TwythonAuthError:
+            print "Error: Invalid comsumer key or consumer secret"
 
         print "\nApprove access to your data at " + request_auth_url
         auth_pin = raw_input("Then enter the authorization PIN: ").strip()
-        twitter = Twython(self.consumer_key, self.consumer_secret, request_oauth_token, request_oauth_token_secret)
+        twitter = twython.Twython(self.consumer_key, self.consumer_secret, request_oauth_token, request_oauth_token_secret)
         oauth = twitter.get_authorized_tokens(auth_pin)
 
         self.oauth_token = oauth['oauth_token']
