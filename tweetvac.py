@@ -8,7 +8,7 @@ import ConfigParser
 
 
 class TwitterAuthConfig(object):
-    """Twitter authorization tool"""
+    """Twitter authorization configuration tool"""
 
     def __init__(self, filename='tweetvac.cfg'):
         self._config = ConfigParser.RawConfigParser()
