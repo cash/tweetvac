@@ -4,7 +4,23 @@ import twython
 import ConfigParser
 
 
-# TODO: catch common problems and display friendly error messages
+class TweetVac(object):
+    """Iterate over tweets from Twitter's API"""
+
+    def __init__(self, config):
+        if isinstance(config, TwitterAuthConfig):
+            self.config = config.get()
+        else:
+            self.config = config
+
+    def get(self, endpoint, params=None, filters=None):
+        """Get an array of tweets"""
+
+        twitter = twython.Twython(*self.config)
+
+        data = twitter.get(endpoint, params)
+
+        # TODO: iterate
 
 
 class TwitterAuthConfig(object):
@@ -13,10 +29,10 @@ class TwitterAuthConfig(object):
     def __init__(self, filename='tweetvac.cfg'):
         self._config = ConfigParser.RawConfigParser()
         self._config_filename = filename
-        self.consumer_key = ''
-        self.consumer_secret = ''
-        self.oauth_token = ''
-        self.oauth_token_secret = ''
+        self.consumer_key = None
+        self.consumer_secret = None
+        self.oauth_token = None
+        self.oauth_token_secret = None
 
     def load(self):
         """Load the authorization information from the config file"""
@@ -37,6 +53,11 @@ class TwitterAuthConfig(object):
         """
 
         (self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret) = auth_params
+
+    def get(self):
+        """Get the authorization information"""
+
+        return self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret
 
     def save(self):
         """Save the authorization information to the config file"""
@@ -106,4 +127,3 @@ class TwitterAuthHelper(object):
 
 class TwitterAuthException(Exception):
     """An error with authorization occurred."""
-
