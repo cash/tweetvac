@@ -8,19 +8,48 @@ class TweetVac(object):
     """Iterate over tweets from Twitter's API"""
 
     def __init__(self, config):
+        self.hit_rate_limit = False
         if isinstance(config, TwitterAuthConfig):
             self.config = config.get()
         else:
             self.config = config
 
-    def get(self, endpoint, params=None, filters=None):
+    def get(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
         """Get an array of tweets"""
 
         twitter = twython.Twython(*self.config)
 
-        data = twitter.get(endpoint, params)
+        data = []
+        request_counter = 0
+        self.hit_rate_limit = False
+        while True:
+            try:
+                batch = twitter.get(endpoint, params)
+            except twython.exceptions.TwythonRateLimitError:
+                self.hit_rate_limit = True
+                return data
 
-        # TODO: iterate
+            request_counter += 1
+
+            if not batch:
+                break
+
+            if filters is not None:
+                for f in filters:
+                    batch = filter(f, batch)
+
+            data.extend(batch)
+            params['max_id'] = batch[-1]['id'] - 1
+            print(params['max_id'])
+
+            if cutoff is not None and cutoff(batch[-1]):
+                # TODO remove items past the cutoff
+                break
+
+            if request_counter == max_requests:
+                break
+
+        return data
 
 
 class TwitterAuthConfig(object):
