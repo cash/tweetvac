@@ -15,7 +15,14 @@ class TweetVac(object):
             self.config = config
 
     def get(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
-        """Get an array of tweets"""
+        """Get a list of tweets
+
+        :param endpoint: The twitter endpoint to call (ex. 'statuses/user_timeline')
+        :param params: Parameters as dict for twitter endpoint
+        :param cutoff: Optional function that returns true to stop the process
+        :param filters: Optional function that removes tweets from each batch
+        :param max_requests: Optional number of requests to make before stopping
+        """
 
         twitter = twython.Twython(*self.config)
 
@@ -38,13 +45,13 @@ class TweetVac(object):
                 for f in filters:
                     batch = filter(f, batch)
 
+            if cutoff is not None and cutoff(batch[-1]):
+                batch = [item for item in batch if not cutoff(item)]
+                # set stopping condition
+                max_requests = request_counter
+
             data.extend(batch)
             params['max_id'] = batch[-1]['id'] - 1
-            print(params['max_id'])
-
-            if cutoff is not None and cutoff(batch[-1]):
-                # TODO remove items past the cutoff
-                break
 
             if request_counter == max_requests:
                 break
