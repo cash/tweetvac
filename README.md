@@ -41,7 +41,6 @@ or use the configuration object:
 
 ```python
 config = tweetvac.TweetVacAuthConfig()
-config.load()
 vac = tweetvac.TweetVac(config)
 ```
 

@@ -16,6 +16,8 @@ class TweetVac(object):
 
         self.hit_rate_limit = False
         if isinstance(config, TweetVacAuthConfig):
+            if not config.is_loaded():
+                config.load()
             self.config = config.get()
         else:
             self.config = config
@@ -80,6 +82,12 @@ class TweetVacAuthConfig(object):
         self.consumer_secret = None
         self.oauth_token = None
         self.oauth_token_secret = None
+
+    def is_loaded(self):
+        """Is the authorization information loaded or set"""
+
+        return self.consumer_key is not None and self.consumer_secret is not None and \
+            self.oauth_token is not None and self.oauth_token_secret is not None
 
     def load(self):
         """Load the authorization information from the config file"""
