@@ -40,7 +40,7 @@ vac = tweetvac.TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token
 or use the configuration object:
 
 ```python
-config = tweetvac.TwitterAuthConfig()
+config = tweetvac.TweetVacAuthConfig()
 config.load()
 vac = tweetvac.TweetVac(config)
 ```

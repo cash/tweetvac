@@ -9,7 +9,7 @@ class TweetVac(object):
 
     def __init__(self, config):
         self.hit_rate_limit = False
-        if isinstance(config, TwitterAuthConfig):
+        if isinstance(config, TweetVacAuthConfig):
             self.config = config.get()
         else:
             self.config = config
@@ -59,7 +59,7 @@ class TweetVac(object):
         return data
 
 
-class TwitterAuthConfig(object):
+class TweetVacAuthConfig(object):
     """Twitter authorization configuration tool"""
 
     def __init__(self, filename='tweetvac.cfg'):
@@ -80,7 +80,7 @@ class TwitterAuthConfig(object):
             self.oauth_token = self._config.get('Auth', 'oauth_token')
             self.oauth_token_secret = self._config.get('Auth', 'oauth_token_secret')
         except ConfigParser.NoSectionError:
-            raise TwitterAuthException("No data")
+            raise TweetVacAuthException("No data")
 
     def set(self, auth_params):
         """Set the authorization information
@@ -108,7 +108,7 @@ class TwitterAuthConfig(object):
             self._config.write(config_file)
 
 
-class TwitterAuthHelper(object):
+class TweetVacAuthHelper(object):
     """"Helps a user through the OAuth process to get OAuth token"""
 
     def __init__(self, consumer_key=None, consumer_secret=None):
@@ -161,5 +161,5 @@ class TwitterAuthHelper(object):
         return oauth['oauth_token'], oauth['oauth_token_secret']
 
 
-class TwitterAuthException(Exception):
+class TweetVacAuthException(Exception):
     """An error with authorization occurred."""
