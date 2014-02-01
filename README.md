@@ -5,6 +5,11 @@ Python package for sucking down tweets from Twitter. It implements Twitter's
 [guidelines for working with timelines](https://dev.twitter.com/docs/working-with-timelines)
 so that you don't have to.
 
+tweetvac supports retrospective pulling of tweets from Twitter. For example, it
+can pull down a large number of tweets by a specific user or all the tweets
+from a geographic area that mentions a search term. It automatically generates
+the requests to work backward along the timeline.
+
 Authentication
 ==============
 Twitter requires OAuth. tweetvac can store a user's authentication information
@@ -49,19 +54,21 @@ Sucking down tweets
 
 tweetvac expects a Twitter endpoint and a dictionary of parameters for that
 endpoint. Read the [Twitter documentation](https://dev.twitter.com/docs/api/1.1)
-for a list of endpoints and their parameters.
+for a list of endpoints and their parameters. It is recommended to set the count
+option in the params dict to the largest value supported by that endpoint.
 
 ```python
-params = {'screen_name': 'struckDC', 'count': 100}
+params = {'screen_name': 'struckDC', 'count': 200}
 data = vac.get('statuses/user_timeline', params)
 ```
 
 Saving data
 ------------
-The data returned is a list of objects and can be serialized into json for storage.
+The data returned is a list of dicts and can be serialized into json for storage.
 
 ```python
-print json.dumps(data)
+with open('data.json', 'w') as outfile:
+    json.dump(data, outfile)
 ```
 
 Advanced
@@ -104,3 +111,15 @@ You can also pass a hard limit to the number of requests to stop tweetvac early:
 
 data = vac.get('statuses/user_timeline', params, max_requests=10)
 ```
+
+Twitter API
+===========
+Supported Endpoints
+--------------------
+ * [statuses/user_timeline](https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline) - tweets by the specified user.
+ * [statuses/home_timeline](https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline) - tweets by those followed by the authenticating user.
+ * [statuses/mentions_timeline](https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline) - tweets mentioning the authenticating user.
+ * [statuses/retweets_of_me](https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me) - tweets that are retweets of the authenticating user.
+ * [search/tweets](https://dev.twitter.com/docs/api/1.1/get/search/tweets) - search over tweets
+
+ The endpoints have different request rate limits, count limits per request, and total tweet count limits.

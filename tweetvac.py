@@ -135,9 +135,23 @@ class TweetVacAuthConfig(object):
 
 
 class TweetVacAuthHelper(object):
-    """"Interactive helper for getting an OAuth token"""
+    """Interactive helper for getting an OAuth token
+
+    To use:
+    helper = TweetVacAuthHelper()
+    auth = helper.run()
+    config = TweetVacAuthConfig()
+    config.set(auth)
+    config.save()
+    """
 
     def __init__(self, consumer_key=None, consumer_secret=None):
+        """Construct a TweetVacAuthHelper object
+
+        :param consumer_key: Optional consumer key from Twitter associated with your app
+        :param consumer_secret: Optional consumer secret from Twitter associated with your app
+        """
+
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
