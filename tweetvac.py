@@ -5,9 +5,15 @@ import ConfigParser
 
 
 class TweetVac(object):
-    """Iterate over tweets from Twitter's API"""
+    """Suck down tweets using Twitter's API"""
 
     def __init__(self, config):
+        """Construct a TweetVac object
+
+        :param config: A tuple of auth parameters or a TweetVacAuthConfig object. The tuple
+                       should be ordered as (consumer_key, consumer_secret, oauth_token, oauth_secret)
+        """
+
         self.hit_rate_limit = False
         if isinstance(config, TweetVacAuthConfig):
             self.config = config.get()
@@ -63,6 +69,11 @@ class TweetVacAuthConfig(object):
     """Twitter authorization configuration tool"""
 
     def __init__(self, filename='tweetvac.cfg'):
+        """Construct a TweetVacAuthConfig object
+
+        :param filename: Optional filename of the configuration (default is tweetvac.cfg)
+        """
+
         self._config = ConfigParser.RawConfigParser()
         self._config_filename = filename
         self.consumer_key = None
@@ -91,7 +102,7 @@ class TweetVacAuthConfig(object):
         (self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret) = auth_params
 
     def get(self):
-        """Get the authorization information"""
+        """Get the authorization information as tuple"""
 
         return self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret
 
@@ -109,7 +120,7 @@ class TweetVacAuthConfig(object):
 
 
 class TweetVacAuthHelper(object):
-    """"Helps a user through the OAuth process to get OAuth token"""
+    """"Interactive helper for getting an OAuth token"""
 
     def __init__(self, consumer_key=None, consumer_secret=None):
         self.consumer_key = consumer_key
@@ -124,7 +135,7 @@ class TweetVacAuthHelper(object):
         try:
             (request_token, request_secret, auth_url) = self._get_request_token()
         except twython.exceptions.TwythonAuthError:
-            print "Error: Invalid consumer key or consumer secret"
+            print("Error: Invalid consumer key or consumer secret")
 
         pin = self._get_pin(auth_url)
 
@@ -135,7 +146,7 @@ class TweetVacAuthHelper(object):
     def _get_consumer_data(self):
         """Return the user's app information (consumer token and secret)"""
 
-        print "\nRegister this application with Twitter at https://dev.twitter.com/apps"
+        print("\nRegister this application with Twitter at https://dev.twitter.com/apps")
         consumer_key = raw_input("Enter your consumer key: ").strip()
         consumer_secret = raw_input("Enter your consumer secret: ").strip()
         return consumer_key, consumer_secret
@@ -150,7 +161,7 @@ class TweetVacAuthHelper(object):
     def _get_pin(self, request_auth_url):
         """Return authorization pin from user"""
 
-        print "\nApprove access to your data at " + request_auth_url
+        print("\nApprove access to your data at " + request_auth_url)
         return raw_input("Then enter the authorization PIN: ").strip()
 
     def _get_oauth_token(self,  request_token, request_token_secret, auth_pin):
