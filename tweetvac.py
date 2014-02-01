@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 
 import twython
-import ConfigParser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 
 
 class TweetVac(object):
@@ -40,6 +43,8 @@ class TweetVac(object):
         while True:
             try:
                 batch = twitter.get(endpoint, params)
+            except twython.exceptions.TwythonAuthError as e:
+                raise TweetVacAuthException(e)
             except twython.exceptions.TwythonRateLimitError:
                 self.hit_rate_limit = True
                 return data
@@ -76,7 +81,7 @@ class TweetVacAuthConfig(object):
         :param filename: Optional filename of the configuration (default is tweetvac.cfg)
         """
 
-        self._config = ConfigParser.RawConfigParser()
+        self._config = configparser.RawConfigParser()
         self._config_filename = filename
         self.consumer_key = None
         self.consumer_secret = None
@@ -92,14 +97,16 @@ class TweetVacAuthConfig(object):
     def load(self):
         """Load the authorization information from the config file"""
 
-        self._config.read(self._config_filename)
         try:
+            self._config.read(self._config_filename)
             self.consumer_key = self._config.get('Auth', 'consumer_key')
             self.consumer_secret = self._config.get('Auth', 'consumer_secret')
             self.oauth_token = self._config.get('Auth', 'oauth_token')
             self.oauth_token_secret = self._config.get('Auth', 'oauth_token_secret')
-        except ConfigParser.NoSectionError:
-            raise TweetVacAuthException("No data")
+        except (configparser.MissingSectionHeaderError, configparser.NoSectionError):
+            raise TweetVacAuthException("No [Auth] section or no config file: " + self._config_filename)
+        except configparser.NoOptionError as e:
+            raise TweetVacAuthException("Missing configuration option: " + str(e))
 
     def set(self, auth_params):
         """Set the authorization information
