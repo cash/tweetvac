@@ -51,6 +51,9 @@ class TweetVac(object):
 
             request_counter += 1
 
+            if batch and endpoint == 'search/tweets':
+                batch = batch['statuses']
+
             if not batch:
                 break
 
