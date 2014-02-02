@@ -38,6 +38,7 @@ class TweetVac(object):
         twitter = twython.Twython(*self.config)
 
         data = []
+        params = params or {}
         request_counter = 0
         self.hit_rate_limit = False
         while True:
