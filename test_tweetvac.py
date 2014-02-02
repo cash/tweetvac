@@ -1,7 +1,10 @@
 from tweetvac import TweetVac
 import responses
 import twython
-import urllib
+try:
+    import urllib.parse as urllib
+except ImportError:
+    import urllib
 import unittest
 try:
     import unittest.mock as mock
@@ -33,7 +36,7 @@ class TweetVacTestCase(unittest.TestCase):
     def test_get_should_stop_when_no_data(self):
         endpoint = 'statuses/user_timeline'
         url1 = self.createUrl(endpoint, {})
-        body1 = '[{"id": 200}, {"id": 100}]'
+        body1 = b'[{"id": 200}, {"id": 100}]'
         url2 = self.createUrl(endpoint, {'max_id': '99'})
         body2 = '[]'
         responses.add(responses.GET, url2, body=body2, match_querystring=True, content_type='application/json')
@@ -47,7 +50,7 @@ class TweetVacTestCase(unittest.TestCase):
     def test_get_should_respect_max_requests(self):
         endpoint = 'statuses/user_timeline'
         url = self.createUrl(endpoint, {})
-        body = '[{"id": 200}, {"id": 100}]'
+        body = b'[{"id": 200}, {"id": 100}]'
         responses.add(responses.GET, url, body=body, content_type='application/json')
 
         data = self.tweetvac.get(endpoint, max_requests=5)
@@ -58,7 +61,7 @@ class TweetVacTestCase(unittest.TestCase):
     def test_get_with_filters(self):
         endpoint = 'statuses/user_timeline'
         url = self.createUrl(endpoint, {})
-        body = '[{"id": 200}, {"id": 100}, {"id": 50}, {"id": 25}, {"id": 10}, {"id": 5}]'
+        body = b'[{"id": 200}, {"id": 100}, {"id": 50}, {"id": 25}, {"id": 10}, {"id": 5}]'
         responses.add(responses.GET, url, body=body, content_type='application/json')
 
         def f1(tweet):
