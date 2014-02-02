@@ -10,6 +10,11 @@ can pull down a large number of tweets by a specific user or all the tweets
 from a geographic area that mentions a search term. It automatically generates
 the requests to work backward along the timeline.
 
+Requirements
+============
+tweetvac requires [twython](https://github.com/ryanmcgrath/twython) which can be
+installed using pip or easy_install.
+
 Authentication
 ==============
 Twitter requires OAuth. tweetvac can store a user's authentication information
