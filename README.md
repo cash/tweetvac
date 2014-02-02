@@ -1,4 +1,4 @@
-tweetvac
+tweetvac [![Build Status](https://secure.travis-ci.org/cash/tweetvac.png?branch=master)](https://travis-ci.org/cash/tweetvac)
 ========
 
 Python package for sucking down tweets from Twitter. It implements Twitter's
