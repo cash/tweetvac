@@ -38,7 +38,7 @@ class TweetVacTestCase(unittest.TestCase):
         url1 = self.createUrl(endpoint, {})
         body1 = b'[{"id": 200}, {"id": 100}]'
         url2 = self.createUrl(endpoint, {'max_id': '99'})
-        body2 = '[]'
+        body2 = b'[]'
         responses.add(responses.GET, url2, body=body2, match_querystring=True, content_type='application/json')
         responses.add(responses.GET, url1, body=body1, match_querystring=True, content_type='application/json')
 

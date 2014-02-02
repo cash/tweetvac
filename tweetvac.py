@@ -60,11 +60,13 @@ class TweetVac(object):
 
             if filters is not None:
                 for f in filters:
-                    batch = filter(f, batch)
+                    # a filter function should return false to remove an item
+                    batch = [item for item in batch if f(item)]
 
+            # a cutoff function should return true to indicate the cutoff has been reached
             if cutoff is not None and cutoff(batch[-1]):
                 batch = [item for item in batch if not cutoff(item)]
-                # set stopping condition
+                # set stopping condition to return
                 max_requests = request_counter
 
             data.extend(batch)
