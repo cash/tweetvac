@@ -2,15 +2,11 @@ from tweetvac import TweetVac
 import responses
 import twython
 import urllib
+import unittest
 try:
     import unittest.mock as mock
 except ImportError:
     import mock
-import sys
-if sys.version_info[0] == 2 and sys.version_info[1] == 6:
-    import unittest2 as unittest
-else:
-    import unittest
 
 
 class TweetVacTestCase(unittest.TestCase):
@@ -57,3 +53,22 @@ class TweetVacTestCase(unittest.TestCase):
         data = self.tweetvac.get(endpoint, max_requests=5)
 
         self.assertEqual(10, len(data))
+
+    @responses.activate
+    def test_get_with_filters(self):
+        endpoint = 'statuses/user_timeline'
+        url = self.createUrl(endpoint, {})
+        body = '[{"id": 200}, {"id": 100}, {"id": 50}, {"id": 25}, {"id": 10}, {"id": 5}]'
+        responses.add(responses.GET, url, body=body, content_type='application/json')
+
+        def f1(tweet):
+            return tweet['id'] < 100
+
+        def f2(tweet):
+            return tweet['id'] > 10
+
+        data = self.tweetvac.get(endpoint, filters=[f1, f2], max_requests=1)
+
+        self.assertEquals(2, len(data))
+        self.assertEquals(50, data[0]['id'])
+        self.assertEquals(25, data[1]['id'])
