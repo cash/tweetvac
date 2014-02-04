@@ -1,9 +1,11 @@
-tweetvac `|Build Status| <https://travis-ci.org/cash/tweetvac>`_
+tweetvac
 ================================================================
+.. image:: https://secure.travis-ci.org/cash/tweetvac.png?branch=master
+	:target: https://travis-ci.org/cash/tweetvac
 
 Python package for sucking down tweets from Twitter. It implements
-Twitter's `guidelines for working with
-timelines <https://dev.twitter.com/docs/working-with-timelines>`_ so
+Twitter's `guidelines for working with timelines
+<https://dev.twitter.com/docs/working-with-timelines>`_ so
 that you don't have to.
 
 tweetvac supports retrospective pulling of tweets from Twitter. For
@@ -153,4 +155,3 @@ Supported Endpoints
 The endpoints have different request rate limits, count limits per
 request, and total tweet count limits.
 
-.. |Build Status| image:: https://secure.travis-ci.org/cash/tweetvac.png?branch=master
