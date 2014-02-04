@@ -126,5 +126,6 @@ Supported Endpoints
  * [statuses/mentions_timeline](https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline) - tweets mentioning the authenticating user.
  * [statuses/retweets_of_me](https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me) - tweets that are retweets of the authenticating user.
  * [search/tweets](https://dev.twitter.com/docs/api/1.1/get/search/tweets) - search over tweets
+ * [lists/statuses](https://dev.twitter.com/docs/api/1.1/get/lists/statuses) - tweets from a list of users
 
  The endpoints have different request rate limits, count limits per request, and total tweet count limits.
