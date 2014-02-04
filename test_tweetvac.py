@@ -75,3 +75,18 @@ class TweetVacTestCase(unittest.TestCase):
         self.assertEquals(2, len(data))
         self.assertEquals(50, data[0]['id'])
         self.assertEquals(25, data[1]['id'])
+
+    @responses.activate
+    def test_get_with_cutoff(self):
+        endpoint = 'statuses/user_timeline'
+        url = self.createUrl(endpoint, {})
+        body = b'[{"id": 200}, {"id": 100}]'
+        responses.add(responses.GET, url, body=body, content_type='application/json')
+
+        def f(tweet):
+            return tweet['id'] == 100
+
+        data = self.tweetvac.get(endpoint, cutoff=f)
+
+        self.assertEquals(1, len(data))
+        self.assertEquals(200, data[0]['id'])

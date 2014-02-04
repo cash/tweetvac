@@ -21,9 +21,10 @@ class TweetVac(object):
         if isinstance(config, TweetVacAuthConfig):
             if not config.is_loaded():
                 config.load()
-            self.config = config.get()
+            self._config = config.get()
         else:
-            self.config = config
+            self._config = config
+        self._twitter = twython.Twython(*self._config)
 
     def get(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
         """Get a list of tweets
@@ -35,15 +36,14 @@ class TweetVac(object):
         :param max_requests: Optional number of requests to make before stopping
         """
 
-        twitter = twython.Twython(*self.config)
-
         data = []
         params = params or {}
+        stop = False
         request_counter = 0
         self.hit_rate_limit = False
-        while True:
+        while not stop:
             try:
-                batch = twitter.get(endpoint, params)
+                batch = self._twitter.get(endpoint, params)
             except twython.exceptions.TwythonAuthError as e:
                 raise TweetVacAuthException(e)
             except twython.exceptions.TwythonRateLimitError:
@@ -66,14 +66,13 @@ class TweetVac(object):
             # a cutoff function should return true to indicate the cutoff has been reached
             if cutoff is not None and cutoff(batch[-1]):
                 batch = [item for item in batch if not cutoff(item)]
-                # set stopping condition to return
-                max_requests = request_counter
+                stop = True
 
             data.extend(batch)
             params['max_id'] = batch[-1]['id'] - 1
 
             if request_counter == max_requests:
-                break
+                stop = True
 
         return data
 
