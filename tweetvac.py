@@ -7,6 +7,12 @@ except ImportError:
     import ConfigParser as configparser
 
 
+__version__ = '0.1'
+__author__ = 'Cash Costello'
+__license__ = 'GPLv2'
+__copyright__ = 'Copyright 2014 Cash Costello'
+
+
 class TweetVac(object):
     """A vacuum for sucking down tweets using Twitter's API"""
 

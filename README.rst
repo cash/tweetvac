@@ -87,7 +87,7 @@ endpoint.
     data = vac.suck('statuses/user_timeline', params)
 
 Work with the data
------------
+------------------
 
 The data returned is a list of dicts. The fields in the dict are listed in the Twitter
 API `documentation on the Tweet object <https://dev.twitter.com/docs/platform-objects/tweets>`_.
