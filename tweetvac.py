@@ -8,7 +8,7 @@ except ImportError:
 
 
 class TweetVac(object):
-    """Suck down tweets using Twitter's API"""
+    """A vacuum for sucking down tweets using Twitter's API"""
 
     def __init__(self, config):
         """Construct a TweetVac object
@@ -26,14 +26,15 @@ class TweetVac(object):
             self._config = config
         self._twitter = twython.Twython(*self._config)
 
-    def get(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
-        """Get a list of tweets
+    def suck(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
+        """Suck tweets from Twitter as a list
 
         :param endpoint: The twitter endpoint to call (ex. 'statuses/user_timeline')
         :param params: Parameters as dict for twitter endpoint
         :param cutoff: Optional function that returns true to stop the process
         :param filters: Optional function that removes tweets from each batch
         :param max_requests: Optional number of requests to make before stopping
+        :return A list of tweets
         """
 
         data = []

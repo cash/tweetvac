@@ -48,23 +48,30 @@ in a configuration file.
 The Basics
 ==========
 
-Creating a Tweetvac instance
+Import tweetvac
+--------------------
+
+::
+
+    from tweetvac import TweetVac
+
+Create a TweetVac instance
 ----------------------------
 
 You can pass the OAuth parameters as a tuple:
 
 ::
 
-    vac = tweetvac.TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token_secret))
+    vac = TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token_secret))
 
 or use the configuration object:
 
 ::
 
-    config = tweetvac.TweetVacAuthConfig()
-    vac = tweetvac.TweetVac(config)
+    config = TweetVacAuthConfig()
+    vac = TweetVac(config)
 
-Sucking down tweets
+Suck down tweets
 -------------------
 
 tweetvac expects a Twitter endpoint and a dictionary of parameters for
@@ -77,13 +84,15 @@ endpoint.
 ::
 
     params = {'screen_name': 'struckDC', 'count': 200}
-    data = vac.get('statuses/user_timeline', params)
+    data = vac.suck('statuses/user_timeline', params)
 
-Saving data
+Work with the data
 -----------
 
-The data returned is a list of dicts and can be serialized into json for
-storage.
+The data returned is a list of dicts. The fields in the dict are listed in the Twitter
+API `documentation on the Tweet object <https://dev.twitter.com/docs/platform-objects/tweets>`_.
+
+The data can be converted back to json and stored to a file like this:
 
 ::
 
@@ -105,10 +114,9 @@ a list of filter functions.
     def remove_mention_tweets(tweet):
         return not '@' in tweet['text']
 
-    data = vac.get('statuses/user_timeline', params, filters=[remove_mention_tweets])
+    data = vac.suck('statuses/user_timeline', params, filters=[remove_mention_tweets])
 
-Return false from your function to remove the tweet from the list that
-will be returned to you.
+Return false from your function to remove the tweet from the list.
 
 Turning off the vacuum
 ----------------------
@@ -124,14 +132,14 @@ function that returns true when tweetvac should stop.
         tweet_date = time.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
         return tweet_date < cutoff_date
 
-    data = vac.get('statuses/user_timeline', params, cutoff=stop)
+    data = vac.suck('statuses/user_timeline', params, cutoff=stop)
 
 You can also pass a hard limit to the number of requests to stop
 tweetvac early:
 
 ::
 
-    data = vac.get('statuses/user_timeline', params, max_requests=10)
+    data = vac.suck('statuses/user_timeline', params, max_requests=10)
 
 Twitter API
 ===========
