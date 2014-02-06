@@ -14,11 +14,16 @@ all the tweets from a geographic area that mentions a search term. It
 automatically generates the requests to work backward along the
 timeline.
 
-Requirements
+Installation
 ============
+Install tweetvac using pip:
 
-tweetvac requires `twython <https://github.com/ryanmcgrath/twython>`_
-which can be installed using pip or easy\_install.
+.. code-block:: bash
+
+    $ pip install tweetvac
+
+If cloning this repository, you need to install
+`twython <https://github.com/ryanmcgrath/twython>`_ and its dependencies.
 
 Authentication
 ==============
@@ -51,7 +56,7 @@ The Basics
 Import tweetvac
 --------------------
 
-::
+.. code-block:: python
 
     from tweetvac import TweetVac
 
@@ -60,13 +65,13 @@ Create a TweetVac instance
 
 You can pass the OAuth parameters as a tuple:
 
-::
+.. code-block:: python
 
     vac = TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token_secret))
 
 or use the configuration object:
 
-::
+.. code-block:: python
 
     config = TweetVacAuthConfig()
     vac = TweetVac(config)
@@ -81,7 +86,7 @@ endpoints and their parameters. It is recommended to set the count
 option in the params dict to the largest value supported by that
 endpoint.
 
-::
+.. code-block:: python
 
     params = {'screen_name': 'struckDC', 'count': 200}
     data = vac.suck('statuses/user_timeline', params)
@@ -94,7 +99,7 @@ API `documentation on the Tweet object <https://dev.twitter.com/docs/platform-ob
 
 The data can be converted back to json and stored to a file like this:
 
-::
+.. code-block:: python
 
     with open('data.json', 'w') as outfile:
         json.dump(data, outfile)
@@ -109,7 +114,7 @@ Twitter provides several parameters on each endpoint for selecting what
 tweets you want to retrieve. Additional culling is available by passing
 a list of filter functions.
 
-::
+.. code-block:: python
 
     def remove_mention_tweets(tweet):
         return not '@' in tweet['text']
@@ -125,7 +130,7 @@ tweetvac will suck down tweets until you reach your rate limit or you
 consume all the available tweets. To stop sooner, you can pass a cutoff
 function that returns true when tweetvac should stop.
 
-::
+.. code-block:: python
 
     def stop(tweet):
         cutoff_date = time.strptime("Wed Jan 01 00:00:00 +0000 2014", '%a %b %d %H:%M:%S +0000 %Y')
@@ -137,7 +142,7 @@ function that returns true when tweetvac should stop.
 You can also pass a hard limit to the number of requests to stop
 tweetvac early:
 
-::
+.. code-block:: python
 
     data = vac.suck('statuses/user_timeline', params, max_requests=10)
 
