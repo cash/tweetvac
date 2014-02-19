@@ -47,6 +47,8 @@ class TweetVac(object):
                 batch = self._twitter.get(endpoint, params)
             except twython.exceptions.TwythonAuthError as e:
                 raise TweetVacAuthException(e)
+            except twython.exceptions.TwythonError as e:
+                raise TweetVacHttpException(e)
             except twython.exceptions.TwythonRateLimitError:
                 self.hit_rate_limit = True
                 return data
@@ -209,3 +211,6 @@ class TweetVacAuthHelper(object):
 
 class TweetVacAuthException(Exception):
     """An error with authorization occurred."""
+
+class TweetVacHttpException(Exception):
+    """An error with with a http request occurred."""
