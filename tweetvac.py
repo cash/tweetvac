@@ -47,11 +47,11 @@ class TweetVac(object):
                 batch = self._twitter.get(endpoint, params)
             except twython.exceptions.TwythonAuthError as e:
                 raise TweetVacAuthException(e)
-            except twython.exceptions.TwythonError as e:
-                raise TweetVacHttpException(e)
             except twython.exceptions.TwythonRateLimitError:
                 self.hit_rate_limit = True
                 return data
+            except twython.exceptions.TwythonError as e:
+                raise TweetVacHttpException(e)
 
             request_counter += 1
 
