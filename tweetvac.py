@@ -77,6 +77,10 @@ class TweetVac(object):
             if request_counter == max_requests:
                 stop = True
 
+            if self._twitter.get_lastfunction_header('x-rate-limit-remaining') == 0:
+                self.hit_rate_limit = True
+                stop = True
+
         return data
 
 
