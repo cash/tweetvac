@@ -58,7 +58,7 @@ Import tweetvac
 
 .. code-block:: python
 
-    from tweetvac import TweetVac
+    import tweetvac
 
 Create a TweetVac instance
 ----------------------------
@@ -67,14 +67,14 @@ You can pass the OAuth parameters as a tuple:
 
 .. code-block:: python
 
-    vac = TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token_secret))
+    vac = tweetvac.TweetVac((consumer_key, consumer_secret, oauth_token, oauth_token_secret))
 
 or use the configuration object:
 
 .. code-block:: python
 
-    config = TweetVacAuthConfig()
-    vac = TweetVac(config)
+    config = tweetvac.AuthConfig()
+    vac = tweetvac.TweetVac(config)
 
 Suck down tweets
 -------------------

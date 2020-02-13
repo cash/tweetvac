@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
 from setuptools import setup
 
 __author__ = 'Cash Costello'
-__version__ = '0.3'
+__version__ = '1.0'
 
 setup(
     name='tweetvac',
@@ -17,7 +15,7 @@ setup(
     keywords='twitter tweet tweetvac cursor client',
     py_modules=['tweetvac'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
@@ -25,7 +23,6 @@ setup(
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules'

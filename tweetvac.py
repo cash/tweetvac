@@ -1,24 +1,27 @@
-from __future__ import unicode_literals
-
+import configparser
 import twython
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+
+
+class TweetVacAuthException(Exception):
+    """An error with authorization occurred."""
+
+
+class TweetVacHttpException(Exception):
+    """An error with with a http request occurred."""
 
 
 class TweetVac(object):
     """A vacuum for sucking down tweets using Twitter's API"""
 
     def __init__(self, config):
-        """Construct a TweetVac object
-
-        :param config: A tuple of auth parameters or a TweetVacAuthConfig object. The tuple
+        """
+        Args:
+            config (tuple, Config): A tuple of auth parameters or a TweetVacAuthConfig object. The tuple
                        should be ordered as (consumer_key, consumer_secret, oauth_token, oauth_secret)
         """
 
         self.hit_rate_limit = False
-        if isinstance(config, TweetVacAuthConfig):
+        if isinstance(config, AuthConfig):
             if not config.is_loaded():
                 config.load()
             self._config = config.get()
@@ -29,14 +32,20 @@ class TweetVac(object):
     def suck(self, endpoint, params=None, cutoff=None, filters=None, max_requests=15):
         """Suck tweets from Twitter as a list
 
-        :param endpoint: The twitter endpoint to call (ex. 'statuses/user_timeline')
-        :param params: Parameters as dict for twitter endpoint
-        :param cutoff: Optional function that returns true to stop the process
-        :param filters: Optional function that removes tweets from each batch
-        :param max_requests: Optional number of requests to make before stopping
-        :return A list of tweets
-        """
+        Args:
+            endpoint (str): The twitter endpoint to call (ex. 'statuses/user_timeline')
+            params (dict): Parameters as dict for twitter endpoint
+            cutoff (callable): Optional function that returns true to stop the process
+            filters (list): Optional list of functions that removes tweets from each batch
+            max_requests (int): Optional number of requests to make before stopping
 
+        Returns:
+            list: A list of tweet objects
+
+        Raises:
+            TweetVacAuthException if OAuth credentials not accepted
+            TweetVacHttpException if http requests fail
+        """
         data = []
         params = params or {}
         stop = False
@@ -84,15 +93,15 @@ class TweetVac(object):
         return data
 
 
-class TweetVacAuthConfig(object):
+class AuthConfig(object):
     """Twitter authorization configuration tool"""
 
     def __init__(self, filename='tweetvac.cfg'):
         """Construct a TweetVacAuthConfig object
 
-        :param filename: Optional filename of the configuration (default is tweetvac.cfg)
+        Args:
+            filename (str, optional): Optional filename of the configuration (default is tweetvac.cfg)
         """
-
         self._config = configparser.RawConfigParser()
         self._config_filename = filename
         self.consumer_key = None
@@ -101,14 +110,16 @@ class TweetVacAuthConfig(object):
         self.oauth_token_secret = None
 
     def is_loaded(self):
-        """Is the authorization information loaded or set"""
+        """Is the authorization information loaded or set
 
+        Returns:
+            bool
+        """
         return self.consumer_key is not None and self.consumer_secret is not None and \
             self.oauth_token is not None and self.oauth_token_secret is not None
 
     def load(self):
         """Load the authorization information from the config file"""
-
         try:
             self._config.read(self._config_filename)
             self.consumer_key = self._config.get('Auth', 'consumer_key')
@@ -117,42 +128,44 @@ class TweetVacAuthConfig(object):
             self.oauth_token_secret = self._config.get('Auth', 'oauth_token_secret')
         except (configparser.MissingSectionHeaderError, configparser.NoSectionError):
             raise TweetVacAuthException("No [Auth] section or no config file: " + self._config_filename)
-        except configparser.NoOptionError as e:
-            raise TweetVacAuthException("Missing configuration option: " + str(e))
+        except configparser.NoOptionError as ex:
+            raise TweetVacAuthException("Missing configuration option: " + str(ex))
 
     def set(self, auth_params):
         """Set the authorization information
 
-        :param auth_params: consumer_key, consumer_secret, oauth_token, oauth_secret as tuple.
+        Args:
+            auth_params (tuple): consumer_key, consumer_secret, oauth_token, oauth_secret.
         """
-
-        (self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret) = auth_params
+        self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret = auth_params
 
     def get(self):
-        """Get the authorization information as tuple"""
+        """Get the authorization information as tuple
 
+        Returns:
+            tuple: consumer_key, consumer_secret, oauth_token, oauth_secret
+        """
         return self.consumer_key, self.consumer_secret, self.oauth_token, self.oauth_token_secret
 
     def save(self):
         """Save the authorization information to the config file"""
-
         self._config.add_section('Auth')
         self._config.set('Auth', 'consumer_key', self.consumer_key)
         self._config.set('Auth', 'consumer_secret', self.consumer_secret)
         self._config.set('Auth', 'oauth_token', self.oauth_token)
         self._config.set('Auth', 'oauth_token_secret', self.oauth_token_secret)
 
-        with open(self._config_filename, 'wb') as config_file:
+        with open(self._config_filename, 'wt') as config_file:
             self._config.write(config_file)
 
 
-class TweetVacAuthHelper(object):
-    """Interactive helper for getting an OAuth token
+class AuthHelper(object):
+    """Interactive console helper for getting an OAuth token
 
     To use:
-    helper = TweetVacAuthHelper()
+    helper = AuthHelper()
     auth = helper.run()
-    config = TweetVacAuthConfig()
+    config = AuthConfig()
     config.set(auth)
     config.save()
     """
@@ -160,61 +173,60 @@ class TweetVacAuthHelper(object):
     def __init__(self, consumer_key=None, consumer_secret=None):
         """Construct a TweetVacAuthHelper object
 
-        :param consumer_key: Optional consumer key from Twitter associated with your app
-        :param consumer_secret: Optional consumer secret from Twitter associated with your app
+        Args:
+            consumer_key (str, optional): Optional consumer key from Twitter associated with your app
+            consumer_secret (str, optional): Optional consumer secret from Twitter associated with your app
         """
-
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
     def run(self):
-        """Run the helper and return the oauth tokens"""
+        """Run the helper and return the oauth tokens
 
+        Returns:
+            tuple: Tuple of consumer key, consumer secret, oauth token, oauth secret
+
+        Raises:
+            TweetVacAuthException: If an error occurs with Twitter authorization
+        """
         if not self.consumer_key and not self.consumer_secret:
-            (self.consumer_key, self.consumer_secret) = self._get_consumer_data()
+            self.consumer_key, self.consumer_secret = self._get_consumer_data()
 
         try:
-            (request_token, request_secret, auth_url) = self._get_request_token()
-        except twython.exceptions.TwythonAuthError:
-            print("Error: Invalid consumer key or consumer secret")
+            request_token, request_secret, auth_url = self._get_request_token()
+        except twython.exceptions.TwythonAuthError as ex:
+            raise TweetVacAuthException("Invalid consumer key or consumer secret") from ex
 
         pin = self._get_pin(auth_url)
-
-        (oauth_token, oauth_secret) = self._get_oauth_token(request_token, request_secret, pin)
+        try:
+            oauth_token, oauth_secret = self._get_oauth_token(request_token, request_secret, pin)
+        except twython.exceptions.TwythonError as ex:
+            raise TweetVacAuthException("Pin was invalid") from ex
 
         return self.consumer_key, self.consumer_secret, oauth_token, oauth_secret
 
-    def _get_consumer_data(self):
-        """Return the user's app information (consumer token and secret)"""
-
+    @staticmethod
+    def _get_consumer_data():
+        """Returns the user's app information (consumer token and secret)"""
         print("\nRegister this application with Twitter at https://dev.twitter.com/apps")
-        consumer_key = raw_input("Enter your consumer key: ").strip()
-        consumer_secret = raw_input("Enter your consumer secret: ").strip()
+        consumer_key = input("Enter your consumer key: ").strip()
+        consumer_secret = input("Enter your consumer secret: ").strip()
         return consumer_key, consumer_secret
 
     def _get_request_token(self):
-        """Return the request token retrieved from Twitter"""
-
+        """Returns the request token retrieved from Twitter"""
         twitter = twython.Twython(self.consumer_key, self.consumer_secret)
         auth = twitter.get_authentication_tokens()
         return auth['oauth_token'], auth['oauth_token_secret'], auth['auth_url']
 
-    def _get_pin(self, request_auth_url):
-        """Return authorization pin from user"""
-
+    @staticmethod
+    def _get_pin(request_auth_url):
+        """Returns authorization pin from user"""
         print("\nApprove access to your data at " + request_auth_url)
-        return raw_input("Then enter the authorization PIN: ").strip()
+        return input("Then enter the authorization PIN: ").strip()
 
-    def _get_oauth_token(self,  request_token, request_token_secret, auth_pin):
-        """Return the authorized oauth token and secret retrieved from Twitter"""
-
+    def _get_oauth_token(self, request_token, request_token_secret, auth_pin):
+        """Returns the authorized oauth token and secret retrieved from Twitter"""
         twitter = twython.Twython(self.consumer_key, self.consumer_secret, request_token, request_token_secret)
         oauth = twitter.get_authorized_tokens(auth_pin)
         return oauth['oauth_token'], oauth['oauth_token_secret']
-
-
-class TweetVacAuthException(Exception):
-    """An error with authorization occurred."""
-
-class TweetVacHttpException(Exception):
-    """An error with with a http request occurred."""
