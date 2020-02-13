@@ -1,15 +1,9 @@
 from tweetvac import TweetVac
 import responses
 import twython
-try:
-    import urllib.parse as urllib
-except ImportError:
-    import urllib
+import urllib.parse as urllib
 import unittest
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
+import unittest.mock as mock
 
 
 class TweetVacTestCase(unittest.TestCase):
