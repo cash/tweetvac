@@ -1,7 +1,7 @@
 from setuptools import setup
 
 __author__ = 'Cash Costello'
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 setup(
     name='tweetvac',
