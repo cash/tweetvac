@@ -5,7 +5,7 @@ tweetvac
 
 Python package for sucking down tweets from Twitter. It implements
 Twitter's `guidelines for working with timelines
-<https://dev.twitter.com/docs/working-with-timelines>`_ so
+<https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines>`_ so
 that you don't have to.
 
 tweetvac supports retrospective pulling of tweets from Twitter. For
@@ -32,7 +32,7 @@ Twitter requires OAuth. tweetvac can store a user's authentication
 information in a configuration file for reuse.
 
 1. Log into Twitter and open
-   `https://dev.twitter.com/apps <https://dev.twitter.com/apps>`_.
+   `https://dev.twitter.com/apps <https://developer.twitter.com/en/apps>`_.
 2. Create a new application. The name needs to be unique across all
    Twitter apps. A callback is not needed.
 3. Create an OAuth access token on your application web page.
@@ -81,9 +81,9 @@ Suck down tweets
 
 tweetvac expects a Twitter endpoint and a dictionary of parameters for
 that endpoint. Read the `Twitter
-documentation <https://dev.twitter.com/docs/api/1.1>`_ for a list of
-endpoints and their parameters. It is recommended to set the count
-option in the params dict to the largest value supported by that
+documentation <https://developer.twitter.com/en/docs/api-reference-index>`_
+for a list of endpoints and their parameters. It is recommended to set the
+count option in the params dict to the largest value supported by that
 endpoint.
 
 .. code-block:: python
@@ -95,7 +95,7 @@ Work with the data
 ------------------
 
 The data returned is a list of dicts. The fields in the dict are listed in the Twitter
-API `documentation on the Tweet object <https://dev.twitter.com/docs/platform-objects/tweets>`_.
+API `documentation on the Tweet object <https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object>`_.
 
 The data can be converted back to json and stored to a file like this:
 
@@ -152,19 +152,16 @@ Twitter API
 Supported Endpoints
 -------------------
 
--  `statuses/user\_timeline <https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline>`_
+-  `statuses/user\_timeline <https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline>`_
    - tweets by the specified user.
--  `statuses/home\_timeline <https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline>`_
+-  `statuses/home\_timeline <https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline>`_
    - tweets by those followed by the authenticating user.
--  `statuses/mentions\_timeline <https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline>`_
+-  `statuses/mentions\_timeline <https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-mentions_timeline>`_
    - tweets mentioning the authenticating user.
--  `statuses/retweets\_of\_me <https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me>`_
+-  `statuses/retweets\_of\_me <https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweets_of_me>`_
    - tweets that are retweets of the authenticating user.
--  `search/tweets <https://dev.twitter.com/docs/api/1.1/get/search/tweets>`_
+-  `search/tweets <https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets>`_
    - search over tweets
--  `lists/statuses <https://dev.twitter.com/docs/api/1.1/get/lists/statuses>`_
-   - tweets from a list of users
 
 The endpoints have different request rate limits, count limits per
 request, and total tweet count limits.
-
