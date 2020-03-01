@@ -16,8 +16,8 @@ class TweetVac(object):
     def __init__(self, config):
         """
         Args:
-            config (tuple, Config): A tuple of auth parameters or a TweetVacAuthConfig object. The tuple
-                       should be ordered as (consumer_key, consumer_secret, oauth_token, oauth_secret)
+            config (tuple, Config): A tuple of auth parameters or an AuthConfig object.
+                The tuple should be ordered as (consumer_key, consumer_secret, oauth_token, oauth_secret)
         """
 
         self.hit_rate_limit = False
@@ -97,7 +97,7 @@ class AuthConfig(object):
     """Twitter authorization configuration tool"""
 
     def __init__(self, filename='tweetvac.cfg'):
-        """Construct a TweetVacAuthConfig object
+        """Construct an AuthConfig object
 
         Args:
             filename (str, optional): Optional filename of the configuration (default is tweetvac.cfg)
@@ -171,7 +171,7 @@ class AuthHelper(object):
     """
 
     def __init__(self, consumer_key=None, consumer_secret=None):
-        """Construct a TweetVacAuthHelper object
+        """Construct an AuthHelper object
 
         Args:
             consumer_key (str, optional): Optional consumer key from Twitter associated with your app
